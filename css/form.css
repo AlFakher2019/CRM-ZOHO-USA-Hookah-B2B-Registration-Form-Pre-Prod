@@ -124,7 +124,12 @@ p {
   padding-bottom: 20px;
   position: relative;
 }
-
+fieldset.fieldset1 {
+  max-height: 800px;
+}
+fieldset.fieldset2 {
+  max-height: 1400px;
+}
 .form-card {
   text-align: left;
 }
@@ -443,10 +448,10 @@ ul {
 }
 .zf-tempContDiv input[type="text"]:focus,
 .zf-tempContDiv textarea:focus {
-  border: 1px solid rgba(121, 187, 238, 0.75) !important;
-  -webkit-box-shadow: 0 0 5px rgba(82, 168, 236, 0.5) !important;
+  border: 1px solid rgb(0 0 0 / 75%) !important;
+  -webkit-box-shadow: 0 0 5px rgba(0, 0, 0, 0.5) !important;
   -moz-box-shadow: 0 0 5px rgba(82, 168, 236, 0.5) !important;
-  box-shadow: 0 0 5px rgba(82, 168, 236, 0.5) !important;
+  box-shadow: 0 0 5px rgb(0 4 6 / 50%) !important;
 }
 
 .zf-tempContDiv textarea {
