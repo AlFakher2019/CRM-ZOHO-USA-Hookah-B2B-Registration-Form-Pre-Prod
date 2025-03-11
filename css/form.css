@@ -124,12 +124,6 @@ p {
   padding-bottom: 20px;
   position: relative;
 }
-fieldset.fieldset1 {
-  max-height: 800px;
-}
-fieldset.fieldset2 {
-  max-height: 1400px;
-}
 .form-card {
   text-align: left;
 }
