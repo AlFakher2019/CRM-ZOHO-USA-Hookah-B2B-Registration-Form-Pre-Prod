@@ -532,9 +532,9 @@
                         </label>
                         <input type="text" maxlength="255" name="Address_ZipCode" checktype="c1" placeholder="" id="postalCode" />
                       </div>
-                      <div class="col2" style="display: none;">
+                      <div class="col2">
      
-                        <div class="zf-tempContDiv">
+                        <div class="zf-tempContDiv" style="display: none;">
                           <span> <input type="text" name="SingleLine5" checktype="c1" value="" maxlength="255" fieldType=1
                               placeholder="" id="stateLabel"/></span>
                           <p id="SingleLine5_error" class="zf-errorMessage" style="display:none;">Invalid value</p>
@@ -1515,10 +1515,8 @@
 
     // Function to handle the search input
     function searchDropdown() {
-
       var country = $(".dropdown-countries").find(":selected").text();
       var country_val = $("#countryF1").find(":selected").val();
-      debugger
       if (country_val == "USA") {
         var city = $(".Address_City").val();
         var zipCode = $(".Address_ZipCode").val();
@@ -1590,6 +1588,7 @@
       let id = thisObj.id;
       const query = `https://api.addressy.com/Capture/Interactive/Retrieve/v1.2/json3.ws?Key=TY78-BD75-NW81-XE97&Id=${id}`;
       fetchData(query, (data) => {
+        console.log(data)
         const filteredOptions = data.Items;
         filteredOptions.forEach((option) => {
           $("#searchInput").val(option.Street)
