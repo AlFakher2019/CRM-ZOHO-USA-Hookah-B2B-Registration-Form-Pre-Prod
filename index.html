@@ -1830,7 +1830,7 @@
                       >Resale&#x2f;Sales Tax License</label
                     >
                     <div class="zf-tempContDiv">
-                      <label for="FileUpload3" class="dropzone">
+                      <label for="fileInput" class="dropzone">
                         <i class="fa-solid fa-arrow-up-from-bracket"></i>
                         <p>
                           <strong>Drag & Drop</strong>
@@ -1958,7 +1958,7 @@
                   <li class="zf-tempFrmWrapper">
                     <label class="zf-labelName">State Tobacco License</label>
                     <div class="zf-tempContDiv">
-                      <label for="FileUpload2" class="dropzone">
+                      <label for="fileInput1" class="dropzone">
                         <i class="fa-solid fa-arrow-up-from-bracket"></i>
                         <p>
                           <strong>Drag & Drop</strong>
@@ -1969,7 +1969,7 @@
                           webp)
                         </p>
                         <p
-                          id="fileNameDisplay"
+                          id="fileNameDisplay1"
                           class="file-name"
                           style="display: none"
                         ></p>
@@ -1977,7 +1977,7 @@
                       <input
                         type="file"
                         name="FileUpload2"
-                        id="fileInput"
+                        id="fileInput1"
                         hidden
                       />
                       <p
@@ -2116,9 +2116,6 @@
             console.log(formattedText);
             document.getElementById("formattedExpirationDate").value =
               formattedText;
-            let dateDisplay = document.getElementById("dateDisplay");
-            dateDisplay.style.display = "block";
-            dateDisplay.innerText = `Selected Date: ${formattedText}`;
           }
         });
         document
@@ -2134,11 +2131,34 @@
             console.log(formattedText);
             document.getElementById("formattedExpirationDate1").value =
               formattedText;
-            let dateDisplay = document.getElementById("dateDisplay");
-            dateDisplay.style.display = "block";
-            dateDisplay.innerText = `Selected Date: ${formattedText}`;
           }
         });
     </script>
+        <script>
+          document
+            .getElementById("fileInput")
+            .addEventListener("change", function (event) {
+              let fileNameDisplay = document.getElementById("fileNameDisplay");
+              if (this.files.length > 0) {
+                fileNameDisplay.textContent = this.files[0].name;
+                fileNameDisplay.style.display = "block";
+              } else {
+                fileNameDisplay.style.display = "none";
+              }
+            });
+        </script>
+                <script>
+                  document
+                    .getElementById("fileInput1")
+                    .addEventListener("change", function (event) {
+                      let fileNameDisplay = document.getElementById("fileNameDisplay1");
+                      if (this.files.length > 0) {
+                        fileNameDisplay.textContent = this.files[0].name;
+                        fileNameDisplay.style.display = "block";
+                      } else {
+                        fileNameDisplay.style.display = "none";
+                      }
+                    });
+                </script>
   </body>
 </html>
