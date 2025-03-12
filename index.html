@@ -507,7 +507,7 @@
                         <label class="zf-labelName">Suite, Unit, Apartment, Box
                           <em class="zf-important">*</em>
                         </label>
-                        <input type="text" maxlength="255" name="Address_AddressLine2" checktype="c1" placeholder="" />
+                        <input type="text" maxlength="255" name="Address_AddressLine2" checktype="c1" placeholder="" id="suite_unit_apt_box_v1"/>
                       </div>
                     </div>
                     <div class="main-f">
@@ -1597,7 +1597,7 @@
           $("#state-dropdown").val(option.PostalCode)
           // $(".state-dropdown").val(option.ProvinceCode).change();
           $("#postalCode").val(option.PostalCode)
-          // $("#county").val(option.AdminAreaName)
+          $("#suite_unit_apt_box_v1").val(option.SubBuilding)
           dropdownList.empty();
         });
       });
