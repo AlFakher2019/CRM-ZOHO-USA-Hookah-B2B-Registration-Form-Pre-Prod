@@ -33,11 +33,19 @@ $(document).ready(function () {
   setProgressBar(current);
   updateButtons(); // Ensure buttons are set correctly at start
 
-  $(".next").click(function () {
+  $(".next").click(async function () {
     current_fs = $(this).closest("fieldset");
     next_fs = current_fs.next("fieldset");
 
-    if (current === 1 && !zf_CheckMandatory()) return false;
+    if (current === 1) {
+      const isMandatoryFilled = zf_CheckMandatory();
+      const isPhoneValid = await phoneNumberValidation();
+      const isPhoneFormatted = phoneFormat();
+      if (!isMandatoryFilled || !isPhoneValid|| !isPhoneFormatted) {
+        return false;
+      }
+    }
+
     if (current === 2) {
       if (!zf_CheckMandatory1()) return false;
       if (!$("#DecisionBox3").is(":checked") && !zf_CheckMandatory2())
@@ -66,7 +74,6 @@ $(document).ready(function () {
   });
 
   $(".previous").click(function () {
-
     current_fs = $(this).closest("fieldset");
     previous_fs = current_fs.prev("fieldset");
 
@@ -77,8 +84,12 @@ $(document).ready(function () {
 
     // Move back one step
     current--;
-    $("#progressbar li").eq($("fieldset").index(previous_fs)).addClass("active");
-    $("#progressbar li").eq($("fieldset").index(current_fs)).removeClass("active");
+    $("#progressbar li")
+      .eq($("fieldset").index(previous_fs))
+      .addClass("active");
+    $("#progressbar li")
+      .eq($("fieldset").index(current_fs))
+      .removeClass("active");
 
     // Ensure the fieldset displays correctly
     previous_fs.show();
@@ -566,5 +577,120 @@ function zf_ValidateMonthYearFormat(inpElem) {
     return true;
   } else {
     return zf_MonthYearRegex.test(monthYearValue);
+  }
+}
+
+async function phoneNumberValidation() {
+  const phoneNumber = document
+    .getElementById("international_PhoneNumber_countrycode")
+    .value.trim();
+  const mobileNumber = document
+    .getElementById("international_PhoneNumber1_countrycode")
+    .value.trim();
+
+  const isValidPhoneNumber = validatePhoneNumber(
+    phoneNumber,
+    "PhoneNumber_error",
+    "Please enter a valid phone number in the required field."
+  );
+  const isValidMobileNumber = validatePhoneNumber(
+    mobileNumber,
+    "PhoneNumber1_error",
+    "Please enter a valid business number in the required field."
+  );
+
+  return isValidPhoneNumber && isValidMobileNumber;
+}
+
+function validatePhoneNumber(number, errorId, errorMessage) {
+  const isValid = number.length > 5; // Allow strings, do not parseInt()
+  const errorElement = document.getElementById(errorId);
+
+  if (isValid) {
+    errorElement.style.display = "none";
+  } else {
+    errorElement.textContent = errorMessage;
+    errorElement.style.display = "block";
+  }
+
+  return isValid;
+}
+
+function phoneFormat() {
+  try {
+
+    debugger
+    // Get the phone number inputs
+    const phoneInput = document.getElementById("international_PhoneNumber_countrycode");
+    const mobileInput = document.getElementById("international_PhoneNumber1_countrycode");
+
+    const phoneNumber = phoneInput.value.trim();
+    const mobileNumber = mobileInput.value.trim();
+
+    // Get intlTelInput instances
+    const itiPhone = window.intlTelInputGlobals.getInstance(phoneInput);
+    const itiMobile = window.intlTelInputGlobals.getInstance(mobileInput);
+
+    // Get selected country codes
+    const countryCodePhone = itiPhone.getSelectedCountryData().iso2.toUpperCase();
+    const countryCodeMobile = itiMobile.getSelectedCountryData().iso2.toUpperCase();
+
+    // Initialize libphonenumber
+    const phoneUtil = window.libphonenumber.PhoneNumberUtil.getInstance();
+
+    let isValidPhone = validateNumber(phoneNumber, countryCodePhone, "PhoneNumber1_error");
+    let isValidMobile = validateNumber(mobileNumber, countryCodeMobile, "PhoneNumber_error");
+
+    return isValidPhone && isValidMobile;
+  } catch (error) {
+    console.error("Phone format validation error:", error);
+    return false;
+  }
+}
+
+// Helper function to validate and display error messages
+function validateNumber(number, countryCode, errorElementId) {
+  try {
+    const phoneUtil = window.libphonenumber.PhoneNumberUtil.getInstance();
+    if (!number) {
+      showError(errorElementId, "Phone number is required.");
+      return false;
+    }
+
+    let parsedNumber;
+    try {
+      parsedNumber = phoneUtil.parse(number, countryCode);
+    } catch (e) {
+      showError(errorElementId, "Invalid phone number format.");
+      return false;
+    }
+
+    if (!phoneUtil.isValidNumber(parsedNumber)) {
+      showError(errorElementId, "Please enter a valid phone number.");
+      return false;
+    }
+
+    hideError(errorElementId);
+    return true;
+  } catch (error) {
+    console.error(`Validation error for ${errorElementId}:`, error);
+    showError(errorElementId, "Validation failed.");
+    return false;
+  }
+}
+
+// Helper functions to show/hide errors
+function showError(elementId, message) {
+  const errorElement = document.getElementById(elementId);
+  if (errorElement) {
+    errorElement.textContent = message;
+    errorElement.style.display = "block";
+  }
+}
+
+function hideError(elementId) {
+  const errorElement = document.getElementById(elementId);
+  if (errorElement) {
+    errorElement.style.display = "none";
   }
 }
