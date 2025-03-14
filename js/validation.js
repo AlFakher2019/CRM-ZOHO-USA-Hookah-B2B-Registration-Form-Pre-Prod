@@ -41,7 +41,8 @@ $(document).ready(function () {
       const isMandatoryFilled = zf_CheckMandatory();
       const isPhoneValid = await phoneNumberValidation();
       const isPhoneFormatted = phoneFormat();
-      if (!isMandatoryFilled || !isPhoneValid|| !isPhoneFormatted) {
+      const isEmailValid = validateEmail($("#Email").val());
+      if (!isMandatoryFilled || !isPhoneValid || !isPhoneFormatted || !isEmailValid) {
         return false;
       }
     }
@@ -618,11 +619,13 @@ function validatePhoneNumber(number, errorId, errorMessage) {
 
 function phoneFormat() {
   try {
-
-    debugger
     // Get the phone number inputs
-    const phoneInput = document.getElementById("international_PhoneNumber_countrycode");
-    const mobileInput = document.getElementById("international_PhoneNumber1_countrycode");
+    const phoneInput = document.getElementById(
+      "international_PhoneNumber_countrycode"
+    );
+    const mobileInput = document.getElementById(
+      "international_PhoneNumber1_countrycode"
+    );
 
     const phoneNumber = phoneInput.value.trim();
     const mobileNumber = mobileInput.value.trim();
@@ -632,14 +635,26 @@ function phoneFormat() {
     const itiMobile = window.intlTelInputGlobals.getInstance(mobileInput);
 
     // Get selected country codes
-    const countryCodePhone = itiPhone.getSelectedCountryData().iso2.toUpperCase();
-    const countryCodeMobile = itiMobile.getSelectedCountryData().iso2.toUpperCase();
+    const countryCodePhone = itiPhone
+      .getSelectedCountryData()
+      .iso2.toUpperCase();
+    const countryCodeMobile = itiMobile
+      .getSelectedCountryData()
+      .iso2.toUpperCase();
 
     // Initialize libphonenumber
     const phoneUtil = window.libphonenumber.PhoneNumberUtil.getInstance();
 
-    let isValidPhone = validateNumber(phoneNumber, countryCodePhone, "PhoneNumber1_error");
-    let isValidMobile = validateNumber(mobileNumber, countryCodeMobile, "PhoneNumber_error");
+    let isValidPhone = validateNumber(
+      phoneNumber,
+      countryCodePhone,
+      "PhoneNumber1_error"
+    );
+    let isValidMobile = validateNumber(
+      mobileNumber,
+      countryCodeMobile,
+      "PhoneNumber_error"
+    );
 
     return isValidPhone && isValidMobile;
   } catch (error) {
@@ -693,4 +708,17 @@ function hideError(elementId) {
   if (errorElement) {
     errorElement.style.display = "none";
   }
+}
+
+function validateEmail(email) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if(emailRegex.test(email)){
+    document.getElementById('Email_error').textContent = '';
+    document.getElementById('Email_error').style.display = "none";
+  }else{
+    document.getElementById('Email_error').textContent = '';
+    document.getElementById('Email_error').textContent = 'Please enter a valid email address.';
+    document.getElementById('Email_error').style.display = "block";
+  }
+  return emailRegex.test(email);
 }
