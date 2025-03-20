@@ -36,21 +36,38 @@ $(document).ready(function () {
   $(".next").click(async function () {
     current_fs = $(this).closest("fieldset");
     next_fs = current_fs.next("fieldset");
-
     if (current === 1) {
       const isMandatoryFilled = zf_CheckMandatory();
       const isPhoneValid = await phoneNumberValidation();
       const isPhoneFormatted = phoneFormat();
       const isEmailValid = validateEmail($("#Email").val());
-      if (!isMandatoryFilled || !isPhoneValid || !isPhoneFormatted || !isEmailValid) {
+      if (
+        !isMandatoryFilled ||
+        !isPhoneValid ||
+        !isPhoneFormatted ||
+        !isEmailValid
+      ) {
         return false;
       }
     }
 
     if (current === 2) {
-      if (!zf_CheckMandatory1()) return false;
-      if (!$("#DecisionBox3").is(":checked") && !zf_CheckMandatory2())
+      const isMandatoryFilledv1 = zf_CheckMandatory1();
+      const isMandatoryFilledv2 = zf_CheckMandatory2();
+      if (!isMandatoryFilledv1){
         return false;
+      }
+
+      // let region = document.getElementById("Regionv2").value.trim();
+      // if (!$("#DecisionBox3").is(":checked") && region == ""){
+
+      //   zf_ShowErrorMsg('Address1_Region');
+      //   return false;
+      // }
+
+      if (!$("#DecisionBox3").is(":checked") && !isMandatoryFilledv2){
+        return false;
+      }
     }
 
     $("#progressbar li").eq($("fieldset").index(next_fs)).addClass("active");
@@ -712,13 +729,14 @@ function hideError(elementId) {
 
 function validateEmail(email) {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if(emailRegex.test(email)){
-    document.getElementById('Email_error').textContent = '';
-    document.getElementById('Email_error').style.display = "none";
-  }else{
-    document.getElementById('Email_error').textContent = '';
-    document.getElementById('Email_error').textContent = 'Please enter a valid email address.';
-    document.getElementById('Email_error').style.display = "block";
+  if (emailRegex.test(email)) {
+    document.getElementById("Email_error").textContent = "";
+    document.getElementById("Email_error").style.display = "none";
+  } else {
+    document.getElementById("Email_error").textContent = "";
+    document.getElementById("Email_error").textContent =
+      "Please enter a valid email address.";
+    document.getElementById("Email_error").style.display = "block";
   }
   return emailRegex.test(email);
 }
