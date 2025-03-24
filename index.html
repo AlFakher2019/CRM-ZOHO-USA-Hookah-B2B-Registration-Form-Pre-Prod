@@ -1390,6 +1390,19 @@
       }
     });
   </script>
+  <script>
+    var input = document.querySelector(
+      "#international_PhoneNumber_countrycode"
+    );
+    function setInitialPhoneNumber() {
+      var countryData = iti.getSelectedCountryData();
+      input.value = `+${countryData.dialCode} `;
+    }
+    setTimeout(setInitialPhoneNumber, 100);
+    input.addEventListener("countrychange", function () {
+      setInitialPhoneNumber();
+    });
+  </script>
 </body>
 
 </html>
