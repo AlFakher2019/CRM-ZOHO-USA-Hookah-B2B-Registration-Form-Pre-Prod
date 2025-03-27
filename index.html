@@ -1400,6 +1400,7 @@
       }
     });
   </script>
+  <!-- Adding country code in mobile phone field -->
   <script>
     var input = document.querySelector(
       "#international_PhoneNumber_countrycode"
@@ -1412,7 +1413,8 @@
     input.addEventListener("countrychange", function () {
       setInitialPhoneNumber();
     });
-   </script>  
+   </script>
+<!-- close the loqate dropdown -->
   <script>
     document.addEventListener("DOMContentLoaded", function () {
       const input = document.getElementById("searchInput");
@@ -1447,6 +1449,7 @@
         });
       });
     </script>
+    <!-- file upload -->
       <script>
         function setupFileUpload(inputId, previewId, textId, removeId, dropzoneId, errorId) {
           let fileInput = document.getElementById(inputId);
@@ -1459,18 +1462,18 @@
           fileInput.addEventListener("change", function () {
             if (this.files.length > 0) {
               fileText.textContent = this.files[0].name;
-              filePreview.style.display = "flex";  // Show file preview
-              dropzone.style.display = "none";  // Hide dropzone
-              errorMessage.style.display = "none";  // Hide error message
+              filePreview.style.display = "flex";  
+              dropzone.style.display = "none";  
+              errorMessage.style.display = "none";  
             }
           });
       
           removeFile.addEventListener("click", function () {
-            fileInput.value = "";  // Clear file input
+            fileInput.value = "";  
             fileText.textContent = "";
-            filePreview.style.display = "none";  // Hide file preview
-            dropzone.style.display = "block";  // Show dropzone again
-            errorMessage.style.display = "block";  // Show error message again
+            filePreview.style.display = "none";  
+            dropzone.style.display = "block";  
+            errorMessage.style.display = "block"; 
           });
         }
       
