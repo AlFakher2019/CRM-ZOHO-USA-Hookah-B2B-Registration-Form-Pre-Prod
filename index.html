@@ -1420,6 +1420,23 @@
       });
     });
   </script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const input = document.getElementById("searchAddress2");
+        document.addEventListener("click", function (event) {
+          const loqateDropdown = document.querySelector(".dropdown-list-SameASBilling");
+          if (!input.contains(event.target) && loqateDropdown && !loqateDropdown.contains(event.target)) {
+            loqateDropdown.style.display = "none";
+          }
+        });
+        input.addEventListener("input", function () {
+          const loqateDropdown = document.querySelector(".dropdown-list-SameASBilling");
+          if (loqateDropdown) {
+            loqateDropdown.style.display = "block"; 
+          }
+        });
+      });
+    </script>
 </body>
 
 </html>
