@@ -1486,18 +1486,24 @@
   <!-- send event for Magento -->
   <script>
     document.addEventListener("DOMContentLoaded", function () {
-      var form = document.getElementById("form"); 
-      var checkbox = document.getElementById("DecisionBox1"); 
+      var submitButton = document.getElementById("submitBtn");
+      var checkbox = document.getElementById("DecisionBox1");
   
-      form.addEventListener("submit", function () {
+      submitButton.addEventListener("click", function () {
+        console.log("Submit button clicked!");
+  
+        // Store checkbox state in sessionStorage
         if (checkbox.checked) {
           sessionStorage.setItem("checkboxChecked", "true");
         } else {
           sessionStorage.setItem("checkboxChecked", "false");
         }
+  
+        console.log("Stored checkbox value:", sessionStorage.getItem("checkboxChecked"));
       });
     });
   </script>
+  
   
   
 </body>
