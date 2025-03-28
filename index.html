@@ -13,6 +13,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
     rel="stylesheet" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
@@ -431,7 +432,7 @@
               <li class="zf-tempFrmWrapper zf-decesion">
                 <div class="zf-tempContDiv">
                   <input type="checkbox" checktype="c1" checked="true" id="DecisionBox3" name="DecisionBox3" />
-                  <label for="DecisionBox3" class="zf-labelName">Same as shipping
+                  <label for="DecisionBox3" class="zf-labelName same-as">Same as shipping
                   </label>
                   <p id="DecisionBox3_error" class="zf-errorMessage" style="display: none">
                     Invalid value
@@ -1122,33 +1123,6 @@
       });
   </script>
   <script>
-    document
-      .getElementById("fileInput")
-      .addEventListener("change", function (event) {
-        let fileNameDisplay = document.getElementById("fileNameDisplay");
-        if (this.files.length > 0) {
-          fileNameDisplay.textContent = this.files[0].name;
-          fileNameDisplay.style.display = "block";
-        } else {
-          fileNameDisplay.style.display = "none";
-        }
-      });
-  </script>
-  <script>
-    document
-      .getElementById("fileInput1")
-      .addEventListener("change", function (event) {
-        let fileNameDisplay = document.getElementById("fileNameDisplay1");
-        if (this.files.length > 0) {
-          fileNameDisplay.textContent = this.files[0].name;
-          fileNameDisplay.style.display = "block";
-        } else {
-          fileNameDisplay.style.display = "none";
-        }
-      });
-  </script>
-
-  <script>
     const dropdownList = $(".dropdown-list");
 
     function fetchData(query, callback) {
@@ -1481,6 +1455,54 @@
         setupFileUpload("fileInput1", "filePreview1", "fileText1", "removeFile1", "dropzoneContainer1", "FileUpload2_error");
         setupFileUpload("fileInput2", "filePreview2", "fileText2", "removeFile2", "dropzoneContainer2", "FileUpload3_error");
       </script>
+<!-- Dynamic Height for Ifram -->
+<!-- <script>
+  function updateHeight() {
+      setTimeout(() => {
+          let formContainer = document.querySelector("#form"); 
+          if (formContainer) {
+              let newHeight = formContainer.scrollHeight + 20; 
+              window.parent.postMessage(newHeight, '*');
+          }
+      }, 200); 
+  }
+  document.addEventListener("DOMContentLoaded", function () {
+      setTimeout(() => {
+          let firstFieldset = document.querySelector("fieldset");
+          if (firstFieldset) {
+              firstFieldset.style.display = "block"; 
+          }
+          updateHeight();
+      }, 300);
+  });
+  document.addEventListener("click", function(event) {
+      if (event.target.matches(".next, .previous, .same-as")) {
+          updateHeight();
+      }
+  });
+  window.addEventListener("resize", updateHeight);
+  </script>   -->
+
+  <!-- send event for Magento -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      var form = document.getElementById("form"); 
+      var checkbox = document.getElementById("DecisionBox1"); 
+  
+      form.addEventListener("submit", function (event) {
+        var isChecked = checkbox ? checkbox.checked : false;
+  
+        var message = {
+          type: "formSubmitted",
+          data: "The form has been submitted and submit button is disabled.",
+          checkboxChecked: isChecked
+        };
+  
+        window.parent.postMessage(message, "*");
+      });
+    });
+  </script>
+  
 </body>
 
 </html>

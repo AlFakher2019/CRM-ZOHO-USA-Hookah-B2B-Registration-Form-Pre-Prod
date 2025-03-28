@@ -659,12 +659,21 @@ ul {
   line-height: 21px;
   margin: 0px 0 0 25px !important;
   padding-bottom: 0 !important;
-  width: 95% !important;
+  width: 95%;
   float: none !important;
   line-height: 21px !important;
   text-align: left !important;
 }
+#iframe-container {
+  overflow: hidden; /* Prevents extra scrollbars */
+}
 
+#iframe {
+  width: 100%;
+  border: none;
+  display: block;
+  overflow: hidden; /* Ensures no internal iframe scrollbars */
+}
 .zf-tempContDiv input[type="file"] {
   outline: none;
   border: 1px solid #ccc;
@@ -1495,6 +1504,9 @@ color: #6C6D73;
 @media only screen and (max-width: 600px) {
   .zf-small .zf-phwrapper {
     width: 100%;
+  }
+  .zf-decesion label{
+    width: auto;
   }
   .zf-medium .zf-phonefld input[type="text"],
   .zf-small .zf-phonefld input[type="text"] {
