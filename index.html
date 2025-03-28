@@ -1489,19 +1489,16 @@
       var form = document.getElementById("form"); 
       var checkbox = document.getElementById("DecisionBox1"); 
   
-      form.addEventListener("submit", function (event) {
-        var isChecked = checkbox ? checkbox.checked : false;
-  
-        var message = {
-          type: "formSubmitted",
-          data: "The form has been submitted and submit button is disabled.",
-          checkboxChecked: isChecked
-        };
-  
-        window.parent.postMessage(message, "*");
+      form.addEventListener("submit", function () {
+        if (checkbox.checked) {
+          sessionStorage.setItem("checkboxChecked", "true");
+        } else {
+          sessionStorage.setItem("checkboxChecked", "false");
+        }
       });
     });
   </script>
+  
   
 </body>
 
