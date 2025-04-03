@@ -431,8 +431,8 @@
               <!---------Decision Starts Here---------->
               <li class="zf-tempFrmWrapper zf-decesion">
                 <div class="zf-tempContDiv">
-                  <input type="checkbox" checktype="c1" checked="true" id="DecisionBox3" name="DecisionBox3" />
-                  <label for="DecisionBox3" class="zf-labelName same-as">Same as shipping
+                  <input type="checkbox" checktype="c1" checked="true" id="DecisionBox3" name="DecisionBox3" class="same" />
+                  <label for="DecisionBox3" class="zf-labelName ">Same as shipping
                   </label>
                   <p id="DecisionBox3_error" class="zf-errorMessage" style="display: none">
                     Invalid value
@@ -1476,9 +1476,10 @@
       setTimeout(updateHeight, 100);
   });
   document.addEventListener("click", function(event) {
-      if (event.target.matches(".next, .previous, .same-as")) {
+      if (event.target.matches(".next, .previous, .same")) {
           setTimeout(updateHeight, 50);
       }
+      console.log(event.target)
   });
   window.addEventListener("resize", updateHeight);
   const observer = new MutationObserver(() => {
