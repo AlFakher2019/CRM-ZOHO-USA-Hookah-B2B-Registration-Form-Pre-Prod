@@ -1458,32 +1458,30 @@
 <!-- Dynamic Height for Ifram -->
 <script>
   function updateHeight() {
-      requestAnimationFrame(() => {
+      setTimeout(() => {
           let formContainer = document.querySelector("#form"); 
           if (formContainer) {
               let newHeight = formContainer.scrollHeight + 20; 
               window.parent.postMessage(newHeight, '*');
           }
-      });
+      }, 200); 
   }
-
   document.addEventListener("DOMContentLoaded", function () {
-      let firstFieldset = document.querySelector("fieldset");
-      if (firstFieldset) {
-          firstFieldset.style.display = "block"; 
-      }
-      updateHeight();
+      setTimeout(() => {
+          let firstFieldset = document.querySelector("fieldset");
+          if (firstFieldset) {
+              firstFieldset.style.display = "block"; 
+          }
+          updateHeight();
+      }, 300);
   });
-
   document.addEventListener("click", function(event) {
       if (event.target.matches(".next, .previous, .same-as")) {
-          setTimeout(updateHeight, 50); 
+          updateHeight();
       }
   });
-
   window.addEventListener("resize", updateHeight);
-</script>
-
+  </script> 
   <!-- send event for Magento -->
   <script>
     document.addEventListener("DOMContentLoaded", function () {
