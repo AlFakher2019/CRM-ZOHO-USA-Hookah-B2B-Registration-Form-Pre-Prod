@@ -1458,28 +1458,22 @@
 <!-- Dynamic Height for Ifram -->
 <script>
   function updateHeight() {
-      document.body.style.overflow = "hidden"; 
-
       requestAnimationFrame(() => {
           let formContainer = document.querySelector("#form"); 
           if (formContainer) {
               let newHeight = formContainer.scrollHeight + 20; 
               window.parent.postMessage(newHeight, '*');
-
-              setTimeout(() => {
-                  document.body.style.overflow = ""; 
-              }, 300); 
           }
       });
   }
 
-  window.onload = function () { 
+  document.addEventListener("DOMContentLoaded", function () {
       let firstFieldset = document.querySelector("fieldset");
       if (firstFieldset) {
           firstFieldset.style.display = "block"; 
       }
-      setTimeout(updateHeight, 100); 
-  };
+      updateHeight();
+  });
 
   document.addEventListener("click", function(event) {
       if (event.target.matches(".next, .previous, .same-as")) {
@@ -1489,6 +1483,7 @@
 
   window.addEventListener("resize", updateHeight);
 </script>
+
   <!-- send event for Magento -->
   <script>
     document.addEventListener("DOMContentLoaded", function () {
