@@ -1458,30 +1458,37 @@
 <!-- Dynamic Height for Ifram -->
 <script>
   function updateHeight() {
-      setTimeout(() => {
-          let formContainer = document.querySelector("#form"); 
+      requestAnimationFrame(() => {
+          let formContainer = document.querySelector("#form");
           if (formContainer) {
-              let newHeight = formContainer.scrollHeight + 20; 
+              formContainer.style.display = "block"; 
+              void formContainer.offsetHeight; 
+
+              let newHeight = formContainer.scrollHeight + 20;
               window.parent.postMessage(newHeight, '*');
+              setTimeout(() => {
+                  document.body.style.overflow = "";
+              }, 300);
           }
-      }, 200); 
+      });
   }
   document.addEventListener("DOMContentLoaded", function () {
-      setTimeout(() => {
-          let firstFieldset = document.querySelector("fieldset");
-          if (firstFieldset) {
-              firstFieldset.style.display = "block"; 
-          }
-          updateHeight();
-      }, 300);
+      setTimeout(updateHeight, 100);
   });
   document.addEventListener("click", function(event) {
       if (event.target.matches(".next, .previous, .same-as")) {
-          updateHeight();
+          setTimeout(updateHeight, 50);
       }
   });
   window.addEventListener("resize", updateHeight);
-  </script> 
+  const observer = new MutationObserver(() => {
+      updateHeight();
+  });
+
+  observer.observe(document.querySelector("#form"), { childList: true, subtree: true });
+</script>
+
+
   <!-- send event for Magento -->
   <script>
     document.addEventListener("DOMContentLoaded", function () {
