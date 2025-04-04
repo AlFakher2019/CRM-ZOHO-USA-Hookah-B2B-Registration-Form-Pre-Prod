@@ -54,10 +54,11 @@ $(document).ready(function () {
 
     if (current === 2) {
       const isMandatoryFilledv1 = zf_CheckMandatory1();
-      const isMandatoryFilledv2 = zf_CheckMandatory2();
       if (!isMandatoryFilledv1){
         return false;
       }
+
+      const isMandatoryFilledv2 = zf_CheckMandatory2();
 
       if (!$("#DecisionBox3").is(":checked") && !isMandatoryFilledv2){
         return false;
@@ -202,28 +203,36 @@ function zf_HideErrorMsg(fieldId) {
 
 
 function zf_CheckMandatory1() {
-  let isValid = true; // Assume all fields are valid initially
-
   for (i = 0; i < zf_MandArray1.length; i++) {
     var fieldObj = document.forms.form[zf_MandArray1[i]];
     if (fieldObj) {
       if (fieldObj.nodeName != null) {
         if (fieldObj.nodeName == "OBJECT") {
           if (!zf_MandatoryCheckSignature(fieldObj)) {
-            isValid = false;
+            zf_ShowErrorMsg(zf_MandArray1[i]);
+            return false;
           }
         } else if (fieldObj.value.replace(/^\s+|\s+$/g, "").length == 0) {
           if (fieldObj.type == "file") {
             fieldObj.focus();
+            zf_ShowErrorMsg(zf_MandArray1[i]);
+            return false;
           }
-          isValid = false;
+          fieldObj.focus();
+          zf_ShowErrorMsg(zf_MandArray1[i]);
+          return false;
         } else if (fieldObj.nodeName == "SELECT") {
+          // No I18N
           if (fieldObj.options[fieldObj.selectedIndex].value == "-Select-") {
-            isValid = false;
+            fieldObj.focus();
+            zf_ShowErrorMsg(zf_MandArray1[i]);
+            return false;
           }
         } else if (fieldObj.type == "checkbox" || fieldObj.type == "radio") {
-          if (!fieldObj.checked) {
-            isValid = false;
+          if (fieldObj.checked == false) {
+            fieldObj.focus();
+            zf_ShowErrorMsg(zf_MandArray1[i]);
+            return false;
           }
         }
       } else {
@@ -235,46 +244,47 @@ function zf_CheckMandatory1() {
           }
         }
         if (checkedValsCount == 0) {
-          isValid = false;
+          inpChoiceElems[0].focus();
+          zf_ShowErrorMsg(zf_MandArray1[i]);
+          return false;
         }
-      }
-
-      if (!isValid) {
-        fieldObj.focus();
-        zf_ShowErrorMsg(zf_MandArray1[i]);
-        return false; // Stop validation if any field is invalid
-      } else {
-        zf_HideErrorMsg(zf_MandArray1[i]); // Remove error if field is valid
       }
     }
   }
-
   return true;
 }
 
 function zf_CheckMandatory2() {
-  let isValid = true; // Assume all fields are valid initially
-
   for (i = 0; i < zf_MandArray2.length; i++) {
     var fieldObj = document.forms.form[zf_MandArray2[i]];
     if (fieldObj) {
       if (fieldObj.nodeName != null) {
         if (fieldObj.nodeName == "OBJECT") {
           if (!zf_MandatoryCheckSignature(fieldObj)) {
-            isValid = false;
+            zf_ShowErrorMsg(zf_MandArray2[i]);
+            return false;
           }
         } else if (fieldObj.value.replace(/^\s+|\s+$/g, "").length == 0) {
           if (fieldObj.type == "file") {
             fieldObj.focus();
+            zf_ShowErrorMsg(zf_MandArray2[i]);
+            return false;
           }
-          isValid = false;
+          fieldObj.focus();
+          zf_ShowErrorMsg(zf_MandArray2[i]);
+          return false;
         } else if (fieldObj.nodeName == "SELECT") {
+          // No I18N
           if (fieldObj.options[fieldObj.selectedIndex].value == "-Select-") {
-            isValid = false;
+            fieldObj.focus();
+            zf_ShowErrorMsg(zf_MandArray2[i]);
+            return false;
           }
         } else if (fieldObj.type == "checkbox" || fieldObj.type == "radio") {
-          if (!fieldObj.checked) {
-            isValid = false;
+          if (fieldObj.checked == false) {
+            fieldObj.focus();
+            zf_ShowErrorMsg(zf_MandArray2[i]);
+            return false;
           }
         }
       } else {
@@ -286,20 +296,13 @@ function zf_CheckMandatory2() {
           }
         }
         if (checkedValsCount == 0) {
-          isValid = false;
+          inpChoiceElems[0].focus();
+          zf_ShowErrorMsg(zf_MandArray2[i]);
+          return false;
         }
-      }
-
-      if (!isValid) {
-        fieldObj.focus();
-        zf_ShowErrorMsg(zf_MandArray2[i]);
-        return false; // Stop validation if any field is invalid
-      } else {
-        zf_HideErrorMsg(zf_MandArray2[i]); // Remove error if field is valid
       }
     }
   }
-
   return true;
 }
 
@@ -387,6 +390,7 @@ function zf_ShowErrorMsg(uniqName) {
   var linkName = uniqName.split("_")[0];
   document.getElementById(linkName + "_error").style.display = "block";
 }
+
 function zf_ValidateNumber(elem) {
   var validChars = "-0123456789";
   var numValue = elem.value.replace(/^\s+|\s+$/g, "");
