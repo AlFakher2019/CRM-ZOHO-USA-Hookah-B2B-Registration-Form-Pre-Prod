@@ -40,13 +40,14 @@ $(document).ready(function () {
       const isMandatoryFilled = zf_CheckMandatory();
       const isPhoneValid = await phoneNumberValidation();
       const isEmailValid = validateEmail($("#Email").val());
-      // const isEmailexist = await validate_Email()
+      const isEmailexist = await validate_Email()
       const isPhoneFormatted = phoneFormat();
       if (
         !isMandatoryFilled ||
         !isPhoneValid ||
         !isPhoneFormatted ||
-        !isEmailValid
+        !isEmailValid ||
+        !isEmailexist
       ) {
         return false;
       }
@@ -630,7 +631,7 @@ function validate_Email() {
     let email = $("#Email").val();
     if (email) {
       const apiUrl =
-        "https://middlewares.azurewebsites.net/api/EmailCheckerZoho?environment=Production&email=" +
+        "https://middlewares.azurewebsites.net/api/EmailCheckerZoho?environment=Sandbox2&email=" +
         email;
 
       // Make the API call using fetch
