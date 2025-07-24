@@ -1131,7 +1131,7 @@
     function searchDropdown() {
       var country = $(".dropdown-countries").find(":selected").text();
       var country_val = $("#countryF1").find(":selected").val();
-      if (country_val == "USA") {
+      if (country_val == "USA" || country_val == "CAN" || country_val == "MEX") {
         var city = $(".Address_City").val();
         var zipCode = $(".Address_ZipCode").val();
         var inputLength = $("#searchInput").val().length;
