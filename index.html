@@ -1203,23 +1203,84 @@
 				input.value = "+" + input.value.replace(/[^0-9]/g, '');
 			}
 		});
-    function getAddressDetail(e, thisObj) {
-      let id = thisObj.id;
-      const query = `https://api.addressy.com/Capture/Interactive/Retrieve/v1.2/json3.ws?Key=TY78-BD75-NW81-XE97&Id=${id}`;
-      fetchData(query, (data) => {
-        console.log(data)
-        const filteredOptions = data.Items;
-        filteredOptions.forEach((option) => {
-          $("#searchInput").val(option.Street)
-          $("#cityV1").val(option.City)
-          $("#stateLabel").val(option.ProvinceCode)
-          $(".state-dropdown").val(option.ProvinceCode).change();
-          $("#postalCode").val(option.PostalCode)
-          $("#suite_unit_apt_box_v1").val(option.SubBuilding)
-          dropdownList.empty();
-        });
-      });
-    }
+    // Replace the getAddressDetail function (around line 553-568)
+function getAddressDetail(e, thisObj) {
+  let id = thisObj.id;
+  const query = `https://api.addressy.com/Capture/Interactive/Retrieve/v1.2/json3.ws?Key=TY78-BD75-NW81-XE97&Id=${id}`;
+  fetchData(query, (data) => {
+    console.log(data)
+    const filteredOptions = data.Items;
+    filteredOptions.forEach((option) => {
+      // Fill street, city, postal code, suite
+      $("#searchInput").val(option.Street)
+      $("#cityV1").val(option.City)
+      $("#postalCode").val(option.PostalCode)
+      $("#suite_unit_apt_box_v1").val(option.SubBuilding)
+      
+      // Get the selected country
+      var selectedCountry = $("#countryF1").val();
+      
+      // Handle state/province based on country
+      if (selectedCountry === "USA" || selectedCountry === "CAN") {
+        var provinceCode = option.ProvinceCode;
+        
+        // For Canada, add "CA-" prefix if not already present
+        if (selectedCountry === "CAN" && provinceCode && !provinceCode.startsWith("CA-")) {
+          provinceCode = "CA-" + provinceCode;
+        }
+        
+        // For USA and Canada: use dropdown
+        $(".state-dropdown").val(provinceCode).change();
+        $("#stateLabel").val(option.ProvinceCode);
+      } else if (selectedCountry === "MEX") {
+        // For Mexico: use text input and fill with province name
+        $(".state-text").val(option.ProvinceName || option.Province);
+        $("#stateLabel").val(option.ProvinceCode);
+      }
+      
+      dropdownList.empty();
+    });
+  });
+}
+
+// 33333333333#############Adresses
+function getAddressDetailSameAsBilling(e, thisObj) {
+  let id = thisObj.id;
+  const query = `https://api.addressy.com/Capture/Interactive/Retrieve/v1.2/json3.ws?Key=TY78-BD75-NW81-XE97&Id=${id}`;
+  fetchData(query, (data) => {
+    const filteredOptions = data.Items;
+    filteredOptions.forEach((option) => {
+      // Fill street, city, postal code, suite
+      $("#searchAddress2").val(option.Street)
+      $("#cityV2").val(option.City)
+      $("#postalCodeV2").val(option.PostalCode)
+      $("#suite_unit_apt_box_v2").val(option.SubBuilding)
+      
+      // Get the selected country
+      var selectedCountry = $("#countryF2").val();
+      
+      // Handle state/province based on country
+      if (selectedCountry === "USA" || selectedCountry === "CAN") {
+        var provinceCode = option.ProvinceCode;
+        
+        // For Canada, added "CA-" prefix 
+        if (selectedCountry === "CAN" && provinceCode && !provinceCode.startsWith("CA-")) {
+          provinceCode = "CA-" + provinceCode;
+        }
+        
+        // For USA and Canada: use dropdown
+        $(".state-dropdown-v2").val(provinceCode).change();
+        $("#stateLabelV2").val(option.ProvinceCode);
+      } else if (selectedCountry === "MEX") {
+        // For Mexico: use text input and fiulled with province name
+        $(".state-text-v2").val(option.ProvinceName || option.Province);
+        $("#stateLabelV2").val(option.ProvinceCode);
+      }
+      
+      dropdownListSameAsBilling.empty();
+    });
+  });
+}
 
     const dropdownListSameAsBilling = $(".dropdown-list-SameASBilling");
     function searchDropdownSameAsBilling() {
@@ -1294,24 +1355,7 @@
 				inputbill.value = "+" + inputbill.value.replace(/[^0-9]/g, '');
 			}
 		});
-    function getAddressDetailSameAsBilling(e, thisObj) {
-      let id = thisObj.id;
-      const query = `https://api.addressy.com/Capture/Interactive/Retrieve/v1.2/json3.ws?Key=TY78-BD75-NW81-XE97&Id=${id}`;
-      fetchData(query, (data) => {
-        const filteredOptions = data.Items;
-        filteredOptions.forEach((option) => {
-          $("#searchAddress2").val(option.Street)
-          $("#cityV2").val(option.City)
-          $("#stateLabelV2").val(option.ProvinceCode)
-          $(".state-dropdown-v2").val(option.ProvinceCode).change();
-          $("#postalCodeV2").val(option.PostalCode)
-          $("#suite_unit_apt_box_v2").val(option.SubBuilding)
-          dropdownListSameAsBilling.empty();
-        });
-      });
-    }
-
-
+    
     var input1 = document.querySelector("#international_PhoneNumber_countrycode");
   var input2 = document.querySelector("#international_PhoneNumber1_countrycode");
 
