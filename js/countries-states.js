@@ -255,6 +255,11 @@ const convert_ISO_3166_2_to_1 = {
 
 // var sortedCountries = Object.fromEntries(countryArray);
 
+// ---------------------------------------------------------------------------
+// OLD STATIC STATES LIST (kept for reference, no longer used).
+// States are now loaded from the CountriesNow API - see fetchStates() below.
+// ---------------------------------------------------------------------------
+/*
 var States = {
   ARE: {
     Dubai: "Dubai",
@@ -356,7 +361,9 @@ var States = {
     Wyoming: "WY",
   },
 };
+*/
 
+// Countries where the state field is required.
 var countriesWithState = ["USA", "CAN"];
 
 var original_zf_MandArray = [
@@ -364,7 +371,147 @@ var original_zf_MandArray = [
   "Address1_Region",
 ];
 
+// ---------------------------------------------------------------------------
+// Countries & states from the CountriesNow API (free, no API key)
+// https://countriesnow.space
+// ---------------------------------------------------------------------------
+const COUNTRIES_NOW_API = "https://countriesnow.space/api/v0.1";
+
+let countriesPromise = null;      // countries are loaded only once
+const statesCache = {};           // ISO-3 code -> Promise of states
+const countryIso2ByIso3 = {};     // "USA" -> "US" (the states endpoint wants ISO-2)
+
+function getJson(url) {
+  return fetch(url).then((res) => {
+    if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
+    return res.json();
+  });
+}
+
+// Returns a Promise of [{ name, iso2, iso3 }] sorted by name.
+function fetchCountries() {
+  if (!countriesPromise) {
+    countriesPromise = getJson(`${COUNTRIES_NOW_API}/countries/iso`)
+      .then((json) => {
+        if (!json || json.error || !Array.isArray(json.data)) {
+          throw new Error((json && json.msg) || "Invalid countries response");
+        }
+        const countries = json.data
+          .filter((c) => c.name && c.Iso2 && c.Iso3)
+          .map((c) => ({
+            name: c.name,
+            iso2: c.Iso2.toUpperCase(),
+            iso3: c.Iso3.toUpperCase(),
+          }))
+          .sort((a, b) => a.name.localeCompare(b.name));
+
+        countries.forEach((c) => (countryIso2ByIso3[c.iso3] = c.iso2));
+        return countries;
+      })
+      .catch((err) => {
+        countriesPromise = null; // allow a retry later
+        throw err;
+      });
+  }
+  return countriesPromise;
+}
+
+// Value submitted for a state. USA & Canada keep the same values the form
+// sent before ("TX", "CA-ON") so Zoho keeps working; other countries send the
+// state name.
+function stateOptionValue(iso3, name, code) {
+  if (iso3 === "USA") return code || name;
+  if (iso3 === "CAN") return code ? "CA-" + code : name;
+  return name;
+}
+
+// Returns a Promise of [{ name, value }] for an ISO-3 country code.
+// Resolves to [] when the country has no states or the request fails, so the
+// form falls back to the free-text state input.
+function fetchStates(iso3) {
+  if (!iso3) return Promise.resolve([]);
+  if (statesCache[iso3]) return statesCache[iso3];
+
+  const iso2 = countryIso2ByIso3[iso3];
+  if (!iso2) return Promise.resolve([]);
+
+  statesCache[iso3] = getJson(
+    `${COUNTRIES_NOW_API}/countries/states/q?iso2=${encodeURIComponent(iso2)}`
+  )
+    .then((json) => {
+      const states =
+        json && !json.error && json.data && Array.isArray(json.data.states)
+          ? json.data.states
+          : [];
+      return states
+        .filter((s) => s.name)
+        .map((s) => ({ name: s.name, value: stateOptionValue(iso3, s.name, s.state_code) }))
+        .sort((a, b) => a.name.localeCompare(b.name));
+    })
+    .catch((err) => {
+      console.error(`Could not load states for ${iso3}:`, err);
+      delete statesCache[iso3]; // allow a retry next time
+      return [];
+    });
+
+  return statesCache[iso3];
+}
+
+// Countries shown in the Shipping Address country dropdown (#countryF1).
+// The Billing dropdown (#countryF2) shows every country from the API.
+const SHIPPING_COUNTRIES = ["CAN", "MEX", "USA"];
+
+// allowedIso3 (optional): only add these countries to the dropdown.
+function fillCountrySelect(select, countries, allowedIso3) {
+  select.length = 1; // keep only the "Select Country" placeholder
+  select.options[0].text = "Select Country";
+  countries.forEach((c) => {
+    if (allowedIso3 && !allowedIso3.includes(c.iso3)) return;
+    select.options[select.options.length] = new Option(c.name, c.iso3);
+  });
+}
+
+// Selects a state in the dropdown by its name (ignores case and accents).
+// Returns true when a matching option was found. Used by the address autofill.
+function selectStateByName(stateDropdown, name) {
+  const normalize = (s) =>
+    (s || "").toString().normalize("NFD").replace(/[̀-ͯ]/g, "").trim().toLowerCase();
+  const target = normalize(name);
+  if (!target) return false;
+
+  const match = Array.from(stateDropdown.options)
+    .slice(1)
+    .find((o) => normalize(o.text) === target || normalize(o.value) === target);
+  if (!match) return false;
+
+  stateDropdown.value = match.value;
+  stateDropdown.dispatchEvent(new Event("change"));
+  return true;
+}
+
 window.onload = function () {
+  const countrySelects = ["countryF1", "countryF2"]
+    .map((id) => document.getElementById(id))
+    .filter(Boolean);
+
+  countrySelects.forEach((s) => (s.options[0].text = "Loading countries..."));
+
+  fetchCountries()
+    .then((countries) => {
+      countrySelects.forEach((s) =>
+        fillCountrySelect(s, countries, s.id === "countryF1" ? SHIPPING_COUNTRIES : null)
+      );
+    })
+    .catch((err) => {
+      console.error("Could not load countries:", err);
+      countrySelects.forEach(
+        (s) => (s.options[0].text = "Could not load countries - please refresh the page")
+      );
+    })
+    .finally(setupCountryAndStateFields);
+};
+
+function setupCountryAndStateFields() {
   setupDropdown(
       "countryF1",
       ".state-dropdown",
@@ -432,28 +579,41 @@ function updateStateDropdown(
   stateLabel,
   dropdownListClass
 ) {
-  stateDropdown.length = 1; // Reset dropdown options
-  stateLabel.value = "";
   const selectedCountry = countrySelect.value;
-  const hasStates = countriesWithState.includes(selectedCountry);
 
-  if (hasStates) {
+  stateDropdown.length = 1; // Reset dropdown options
+  stateDropdown.options[0].text = "Loading states...";
+  stateLabel.value = "";
+  stateText.value = "";
+  stateDropdown.style.display = "block";
+  stateText.style.display = "none";
+
+  // Kept on the element so the address autofill (index.html) can wait for
+  // the list before selecting a state.
+  stateDropdown.statesReady = fetchStates(selectedCountry).then((states) => {
+    // The user picked another country while this was loading - ignore.
+    if (countrySelect.value !== selectedCountry) return;
+
+    stateDropdown.length = 1;
+    stateDropdown.options[0].text = "Select State";
+
+    if (states.length > 0) {
+      states.forEach((s) => {
+        stateDropdown.options[stateDropdown.options.length] = new Option(s.name, s.value);
+      });
       stateDropdown.style.display = "block";
-      star.style.display = "inline-block";
       stateText.style.display = "none";
-
-      for (const state in States[selectedCountry]) {
-          stateDropdown.options[stateDropdown.options.length] = new Option(
-              state,
-              States[selectedCountry][state]
-          );
+      if (countriesWithState.includes(selectedCountry)) {
+        star.style.display = "inline-block";
       }
-  } else {
-      document.querySelector(dropdownListClass).innerHTML = "";
+    } else {
+      // No states for this country (or the API failed) - use free text.
+      const dropdownList = document.querySelector(dropdownListClass);
+      if (dropdownList) dropdownList.innerHTML = "";
       stateDropdown.style.display = "none";
       stateText.style.display = "block";
-      stateText.value = "";
-  }
+    }
+  });
 }
 
 function updateCityDropdown(stateDropdown, stateLabel, stateText) {

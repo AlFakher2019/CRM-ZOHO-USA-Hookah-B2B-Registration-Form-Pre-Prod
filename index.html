@@ -340,9 +340,12 @@
                       <select class="zf-form-sBox dropdown-countries" name="Dropdown5" checktype="c1" id="countryF1">
                         <option value="" id="country" selected="selected" disabled>Select Country
                         </option>
+                        <!-- OLD STATIC COUNTRY LIST (kept for reference, no longer used).
+                             Countries are now loaded from the CountriesNow API in js/countries-states.js.
                         <option value="CAN">Canada</option>
                         <option value="MEX">Mexico</option>
                         <option value="USA">United States of America</option>
+                        -->
                       </select>
                       <p id="Dropdown5_error" class="zf-errorMessage" style="display: none">
                         Invalid value
@@ -494,6 +497,8 @@
                           id="countryF2">
                           <option value="" id="country" selected="selected" disabled>Select Country
                           </option>
+                          <!-- OLD STATIC COUNTRY LIST (kept for reference, no longer used).
+                               Countries are now loaded from the CountriesNow API in js/countries-states.js.
                           <option value="ALA">Åland Islands</option>
                           <option value="ASM">American Samoa</option>
                           <option value="AND">Andorra</option>
@@ -655,6 +660,7 @@
                           <option value="VNM">Vietnam</option>
                           <option value="WLF">Wallis & Futuna</option>
                           <option value="ESH">Western Sahara</option>
+                          -->
                         </select>
                         <p id="Dropdown8_error" class="zf-errorMessage" style="display: none">
                           Invalid value
@@ -1219,25 +1225,33 @@ function getAddressDetail(e, thisObj) {
       
       // Get the selected country
       var selectedCountry = $("#countryF1").val();
-      
-      // Handle state/province based on country
-      if (selectedCountry === "USA" || selectedCountry === "CAN") {
-        var provinceCode = option.ProvinceCode;
-        
-        // For Canada, add "CA-" prefix if not already present
-        if (selectedCountry === "CAN" && provinceCode && !provinceCode.startsWith("CA-")) {
-          provinceCode = "CA-" + provinceCode;
+      var stateDropdownEl = document.querySelector(".state-dropdown");
+
+      // States are loaded from the API - wait until the list is ready.
+      Promise.resolve(stateDropdownEl.statesReady).then(function () {
+        // Handle state/province based on country
+        if (selectedCountry === "USA" || selectedCountry === "CAN") {
+          var provinceCode = option.ProvinceCode;
+
+          // For Canada, add "CA-" prefix if not already present
+          if (selectedCountry === "CAN" && provinceCode && !provinceCode.startsWith("CA-")) {
+            provinceCode = "CA-" + provinceCode;
+          }
+
+          // For USA and Canada: use dropdown
+          $(".state-dropdown").val(provinceCode).change();
+          $("#stateLabel").val(option.ProvinceCode);
+        } else if (selectedCountry === "MEX") {
+          // For Mexico: select the state in the dropdown by name,
+          // otherwise fill the text input with the province name
+          var provinceName = option.ProvinceName || option.Province;
+          if (!selectStateByName(stateDropdownEl, provinceName)) {
+            $(".state-text").val(provinceName);
+          }
+          $("#stateLabel").val(option.ProvinceCode);
         }
-        
-        // For USA and Canada: use dropdown
-        $(".state-dropdown").val(provinceCode).change();
-        $("#stateLabel").val(option.ProvinceCode);
-      } else if (selectedCountry === "MEX") {
-        // For Mexico: use text input and fill with province name
-        $(".state-text").val(option.ProvinceName || option.Province);
-        $("#stateLabel").val(option.ProvinceCode);
-      }
-      
+      });
+
       dropdownList.empty();
     });
   });
@@ -1258,25 +1272,33 @@ function getAddressDetailSameAsBilling(e, thisObj) {
       
       // Get the selected country
       var selectedCountry = $("#countryF2").val();
-      
-      // Handle state/province based on country
-      if (selectedCountry === "USA" || selectedCountry === "CAN") {
-        var provinceCode = option.ProvinceCode;
-        
-        // For Canada, added "CA-" prefix 
-        if (selectedCountry === "CAN" && provinceCode && !provinceCode.startsWith("CA-")) {
-          provinceCode = "CA-" + provinceCode;
+      var stateDropdownEl = document.querySelector(".state-dropdown-v2");
+
+      // States are loaded from the API - wait until the list is ready.
+      Promise.resolve(stateDropdownEl.statesReady).then(function () {
+        // Handle state/province based on country
+        if (selectedCountry === "USA" || selectedCountry === "CAN") {
+          var provinceCode = option.ProvinceCode;
+
+          // For Canada, added "CA-" prefix
+          if (selectedCountry === "CAN" && provinceCode && !provinceCode.startsWith("CA-")) {
+            provinceCode = "CA-" + provinceCode;
+          }
+
+          // For USA and Canada: use dropdown
+          $(".state-dropdown-v2").val(provinceCode).change();
+          $("#stateLabelV2").val(option.ProvinceCode);
+        } else if (selectedCountry === "MEX") {
+          // For Mexico: select the state in the dropdown by name,
+          // otherwise fill the text input with the province name
+          var provinceName = option.ProvinceName || option.Province;
+          if (!selectStateByName(stateDropdownEl, provinceName)) {
+            $(".state-text-v2").val(provinceName);
+          }
+          $("#stateLabelV2").val(option.ProvinceCode);
         }
-        
-        // For USA and Canada: use dropdown
-        $(".state-dropdown-v2").val(provinceCode).change();
-        $("#stateLabelV2").val(option.ProvinceCode);
-      } else if (selectedCountry === "MEX") {
-        // For Mexico: use text input and fiulled with province name
-        $(".state-text-v2").val(option.ProvinceName || option.Province);
-        $("#stateLabelV2").val(option.ProvinceCode);
-      }
-      
+      });
+
       dropdownListSameAsBilling.empty();
     });
   });
